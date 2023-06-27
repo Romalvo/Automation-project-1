@@ -52,7 +52,7 @@ describe('Section 1: Functional tests', () => {
         inputValidData('john.doe')
     })
 
-    it.only('User cannot submit data without user name ', ()=>{
+    it('User cannot submit data without user name ', ()=>{
         // Add test steps for filling in only mandatory fields
         inputValidData () // Type confirmation password which is different from first password
         cy.get('#username').scrollIntoView()
@@ -89,6 +89,13 @@ describe('Section 2: Visual tests', () => {
     })
 
     // Create similar test for checking second picture
+    it('Check that logo number 2 is correct and has correct size', () => {
+        cy.log('Will check cypress logo source and size')
+        cy.get('img[data-cy="cypress_logo"]').should('have.attr', 'src').should('include', 'cypress_logo')
+        // get element and check its parameter height, to be equal 116
+        cy.get('img[data-cy="cypress_logo"]').invoke('height').should('be.lessThan', 116)
+            .and('be.greaterThan', 80)
+    })
 
     it('Check navigation part', () => {
         cy.get('nav').children().should('have.length', 2)
@@ -110,7 +117,26 @@ describe('Section 2: Visual tests', () => {
     })
 
     // Create similar test for checking second link to Cerebrum Hub homepage
-    // Check that URL to Cerebrum Hub page is correct and clickable
+    it('Check navigation part with Cerebrum Hub homepage', () => {
+        cy.get('nav').children().should('have.length', 2)
+
+        // Get navigation element, find siblings that contains h1 and check if it has Registration form in string
+        cy.get('nav').siblings('h1').should('have.text', 'Registration form number 2')
+        
+        // Get navigation element, find its first child, check the link content and click it
+        cy.get('nav').children().eq(1).should('be.visible')
+            .and('have.attr', 'href', 'https://cerebrumhub.com/')
+            .click()
+        
+        // Check that currently opened URL is correct
+        // Check that URL to Cerebrum Hub page is correct and clickable
+        cy.url().should('contain', 'https://cerebrumhub.com/')
+        
+        // Go back to previous page
+        cy.go('back')
+        cy.log('Back again in registration form 2')
+    })
+    
 
     it('Check that radio button list is correct', () => {
         // Array of found elements with given selector has 4 elements in total
@@ -127,6 +153,41 @@ describe('Section 2: Visual tests', () => {
     })
 
     // Create test similar to previous one
+    it('Check that check button list is correct and can choice one element', () => {
+        // Array of found elements with given selector has 3 elements in total
+        cy.get('input[type="checkbox"]').should('have.length', 3)
+        cy.get('input[type="checkbox"]').next().eq(0).should('have.text','I have a bike').and('not.be.checked')
+        cy.get('input[type="checkbox"]').next().eq(1).should('have.text','I have a car').and('not.be.checked')
+        cy.get('input[type="checkbox"]').next().eq(2).should('have.text','I have a boat').and('not.be.checked')
+       
+        // Possible to check 1 element
+        cy.get('input[type="checkbox"]').eq(0).check().should('be.checked')
+        
+    })
+    it('Check that check button list is correct and can choice 2 elements', () => {
+        // Array of found elements with given selector has 3 elements in total
+        cy.get('input[type="checkbox"]').should('have.length', 3)
+        cy.get('input[type="checkbox"]').next().eq(0).should('have.text','I have a bike').and('not.be.checked')
+        cy.get('input[type="checkbox"]').next().eq(1).should('have.text','I have a car').and('not.be.checked')
+        cy.get('input[type="checkbox"]').next().eq(2).should('have.text','I have a boat').and('not.be.checked')
+       
+        // Possible to check 2 elements
+        cy.get('input[type="checkbox"]').eq(0).check().should('be.checked')
+        cy.get('input[type="checkbox"]').eq(1).check().should('be.checked')
+        
+    })
+    it('Check that check button list is correct and can choice 3 elements', () => {
+        // Array of found elements with given selector has 3 elements in total
+        cy.get('input[type="checkbox"]').should('have.length', 3)
+        cy.get('input[type="checkbox"]').next().eq(0).should('have.text','I have a bike').and('not.be.checked')
+        cy.get('input[type="checkbox"]').next().eq(1).should('have.text','I have a car').and('not.be.checked')
+        cy.get('input[type="checkbox"]').next().eq(2).should('have.text','I have a boat').and('not.be.checked')
+       
+        // Possible to check 3 elements
+        cy.get('input[type="checkbox"]').eq(0).check().should('be.checked')
+        cy.get('input[type="checkbox"]').eq(1).check().should('be.checked')
+        cy.get('input[type="checkbox"]').eq(2).check().should('be.checked')
+    })
 
     it('Car dropdown is correct', () => {
         // Here is an example how to explicitely create screenshot from the code
@@ -148,11 +209,28 @@ describe('Section 2: Visual tests', () => {
             expect(actual).to.deep.eq(['volvo', 'saab', 'opel', 'audi'])
         })
     })
-
-
     // Create test similar to previous one
+    it('Favourite animals dropdown is correct', () => {
+        // Here is an example how to explicitely create screenshot from the code
+        // Select second element and create screenshot for this area, and full page
+        cy.get('#animal').select(1).screenshot('Animals drop-down')
+        cy.screenshot('Full page screenshot')
 
-})
+        // Here are given different solutions how to get the length of array of elements in Cars dropdown
+        // Next 2 lines of code do exactly the same!
+        cy.get('#animal').children().should('have.length', 6)
+        cy.get('#animal').find('option').should('have.length', 6)
+        
+        //Check  that second element in the dropdown has text Cat
+        cy.get('#animal').find('option').eq(1).should('have.text', 'Cat')
+        
+        // Advanced level how to check the content of the Cars dropdown
+        cy.get('#animal').find('option').then(options => {
+            const actual = [...options].map(option => option.value)
+            expect(actual).to.deep.eq(['dog', 'cat', 'snake', 'hippo','spider','mouse'])
+        })   
+    })
+})    
 
 function inputValidData() {
     cy.log('Username will be filled')
